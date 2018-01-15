@@ -621,6 +621,54 @@ NAN_METHOD(cryptonight)
 
 }
 
+NAN_METHOD(cryptonight_sld)
+{
+	Isolate* isolate = info.GetIsolate();
+	HandleScope scope(isolate);
+
+	bool fast = false;
+	if (info.Length() < 1)
+	{
+		except("You must provide one argument.");
+	}
+	else
+	{
+		Local<Object> target = info[0]->ToObject();
+		if (!node::Buffer::HasInstance(target))
+		{
+			except("Argument should be a buffer object.");
+
+		}
+		else
+		{
+			if (info.Length() >= 2) {
+				if (!info[1]->IsBoolean())
+				{
+					except("Argument 2 should be a boolean");
+					return;
+				}
+					
+				fast = info[1]->ToBoolean()->BooleanValue();
+			}
+
+			char * input = Buffer::Data(target);
+			char* output = (char*)malloc(32);
+
+			uint32_t input_len = Buffer::Length(target);
+
+			if (fast)
+				cryptonight_fast_hash(input, output, input_len);
+			else
+				cryptonight_hash_sld(input, output, input_len);
+
+			auto result = node::Buffer::New(isolate, output, 32).ToLocalChecked();
+
+			info.GetReturnValue().Set(result);
+		}
+	}
+
+}
+
 NAN_METHOD(x13)
 {
 	Isolate* isolate = info.GetIsolate();
@@ -868,6 +916,7 @@ void init(Local<Object> exports) {
     exports->Set(String::NewFromUtf8(isolate,"hefty1"), Nan::GetFunction(Nan::New<FunctionTemplate>(hefty1)).ToLocalChecked());
     exports->Set(String::NewFromUtf8(isolate,"shavite3"), Nan::GetFunction(Nan::New<FunctionTemplate>(shavite3)).ToLocalChecked());
     exports->Set(String::NewFromUtf8(isolate,"cryptonight"), Nan::GetFunction(Nan::New<FunctionTemplate>(cryptonight)).ToLocalChecked());
+    exports->Set(String::NewFromUtf8(isolate,"cryptonight_sld"), Nan::GetFunction(Nan::New<FunctionTemplate>(cryptonight_sld)).ToLocalChecked());
     exports->Set(String::NewFromUtf8(isolate,"x13"), Nan::GetFunction(Nan::New<FunctionTemplate>(x13)).ToLocalChecked());
     exports->Set(String::NewFromUtf8(isolate,"boolberry"), Nan::GetFunction(Nan::New<FunctionTemplate>(boolberry)).ToLocalChecked());
     exports->Set(String::NewFromUtf8(isolate,"nist5"), Nan::GetFunction(Nan::New<FunctionTemplate>(nist5)).ToLocalChecked());
