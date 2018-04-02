@@ -20,7 +20,7 @@ extern "C" {
     #include "cryptonight.h"
     #include "x13.h"
     #include "nist5.h"
-    #include "sha1.h",
+    #include "sha1.h"
     #include "x15.h"
 	#include "fresh.h"
 }
@@ -572,13 +572,13 @@ NAN_METHOD(shavite3)
 	}
 
 }
-
 NAN_METHOD(cryptonight)
 {
 	Isolate* isolate = info.GetIsolate();
 	HandleScope scope(isolate);
 
 	bool fast = false;
+	uint32_t cn_variant = 0;
 	if (info.Length() < 1)
 	{
 		except("You must provide one argument.");
@@ -594,13 +594,15 @@ NAN_METHOD(cryptonight)
 		else
 		{
 			if (info.Length() >= 2) {
-				if (!info[1]->IsBoolean())
+				if (info[1]->IsBoolean())
+					fast = info[1]->ToBoolean()->BooleanValue();
+				else if (info[1]->IsUint32())
+					cn_variant = info[1]->ToUint32()->Uint32Value();
+				else
 				{
-					except("Argument 2 should be a boolean");
+					except("Argument 2 should be a boolean or uint32_t");
 					return;
 				}
-					
-				fast = info[1]->ToBoolean()->BooleanValue();
 			}
 
 			char * input = Buffer::Data(target);
@@ -611,7 +613,7 @@ NAN_METHOD(cryptonight)
 			if (fast)
 				cryptonight_fast_hash(input, output, input_len);
 			else
-				cryptonight_hash(input, output, input_len);
+				cryptonight_hash(input, output, input_len, cn_variant);
 
 			auto result = node::Buffer::New(isolate, output, 32).ToLocalChecked();
 

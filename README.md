@@ -1,3 +1,9 @@
+## This repo is looking for maintainers! Please reach out if interested.
+
+--------
+
+
+
 node-multi-hashing
 
 forked from https://github.com/zone117x/node-multi-hashing
