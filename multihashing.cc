@@ -903,6 +903,7 @@ void init(Local<Object> exports) {
     exports->Set(String::NewFromUtf8(isolate,"hefty1"), Nan::GetFunction(Nan::New<FunctionTemplate>(hefty1)).ToLocalChecked());
     exports->Set(String::NewFromUtf8(isolate,"shavite3"), Nan::GetFunction(Nan::New<FunctionTemplate>(shavite3)).ToLocalChecked());
     exports->Set(String::NewFromUtf8(isolate,"cryptonight"), Nan::GetFunction(Nan::New<FunctionTemplate>(cryptonight)).ToLocalChecked());
+    exports->Set(String::NewFromUtf8(isolate,"cryptonight_heavy"), Nan::GetFunction(Nan::New<FunctionTemplate>(cryptonight_heavy)).ToLocalChecked());
     exports->Set(String::NewFromUtf8(isolate,"x13"), Nan::GetFunction(Nan::New<FunctionTemplate>(x13)).ToLocalChecked());
     exports->Set(String::NewFromUtf8(isolate,"boolberry"), Nan::GetFunction(Nan::New<FunctionTemplate>(boolberry)).ToLocalChecked());
     exports->Set(String::NewFromUtf8(isolate,"nist5"), Nan::GetFunction(Nan::New<FunctionTemplate>(nist5)).ToLocalChecked());
