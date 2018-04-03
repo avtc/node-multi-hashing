@@ -2,7 +2,7 @@
 #include <node_buffer.h>
 #include <v8.h>
 #include <stdint.h>
-#include "nan.h"
+#include <nan.h>
 
 extern "C" {
     #include "bcrypt.h"
@@ -26,6 +26,7 @@ extern "C" {
 }
 
 #include "boolberry.h"
+#include "cn_heavy/cn_slow_hash.hpp"
 
 using namespace node;
 using namespace v8;
@@ -622,6 +623,38 @@ NAN_METHOD(cryptonight)
 	}
 
 }
+
+NAN_METHOD(cryptonight_heavy) 
+{
+	Isolate* isolate = info.GetIsolate();
+	HandleScope scope(isolate);
+
+    if (info.Length() != 1) 
+    {
+        except("You must provide one argument.");
+        return;
+    }
+
+    Local<Object> target = info[0]->ToObject();
+
+    if(!Buffer::HasInstance(target)) 
+    {
+        except("Argument should be a buffer object.");
+        return;
+    }
+
+    char* input = Buffer::Data(target);
+    char* output = (char*)malloc(32);
+    
+    uint32_t input_len = Buffer::Length(target);
+
+    cn_heavy::cn_pow_hash_v2 ctx;
+    ctx.hash(input, input_len, output);
+
+    auto result = node::Buffer::New(isolate, output, 32).ToLocalChecked();
+    info.GetReturnValue().Set(result);
+}
+
 
 NAN_METHOD(x13)
 {
